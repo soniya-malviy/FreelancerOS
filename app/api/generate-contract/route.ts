@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "system",
-          content: "You are an expert contract writer for freelancers. You write clear, professional contracts in plain English — no legalese. Your contracts are suitable for Indian freelancers working with global clients.",
+          content: "You are an expert contract writer for freelancers. You write clear, professional contracts in plain English — no legalese. Your contracts are suitable for freelancers working with global clients.",
         },
         {
           role: "user",
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
 Include sections: Scope of Work, Payment Terms, Revision Policy, Intellectual Property (client owns final files after full payment), Confidentiality, Cancellation Policy (50% kill fee if cancelled after work begins).
 
-Tone: Professional but plain English. No legalese. Suitable for Indian freelancers.
+Tone: Professional but plain English. No legalese. Suitable for global freelancers.
 Output ONLY the contract text, formatted with clear section headings.`,
         },
       ],

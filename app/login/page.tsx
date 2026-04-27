@@ -13,9 +13,10 @@ function LoginForm() {
   const next = searchParams.get("next") || "/dashboard";
   const supabase = createClient();
 
-  const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
-
   const handleGoogleLogin = async () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+    
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -28,6 +29,9 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,

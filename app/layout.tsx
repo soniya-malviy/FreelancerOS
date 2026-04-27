@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import VisitTracker from "@/components/VisitTracker";
 
 export const metadata: Metadata = {
   title: "FreelanceOS — AI Proposal Generator for Freelancers",
@@ -13,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -21,9 +23,18 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{const t=localStorage.getItem('fo_theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`,
+          }}
+        />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ThemeProvider>
+          <VisitTracker />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

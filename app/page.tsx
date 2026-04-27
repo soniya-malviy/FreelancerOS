@@ -42,29 +42,29 @@ export default function Home() {
                 </svg>
               </Link>
               <p className="text-sm text-muted mt-4">
-                3 free proposals/month. No credit card.
+                Unlimited proposals. No credit card needed.
               </p>
             </div>
           </div>
         </section>
 
         {/* Social Proof */}
-        <section className="border-y border-border bg-card/50">
+        <section className="border-y border-border" style={{ backgroundColor: 'var(--bg-surface)' }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center gap-4">
             {/* Avatar stack */}
             <div className="flex -space-x-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-600 border-2 flex items-center justify-center text-white text-xs font-bold" style={{ borderColor: 'var(--bg-body)' }}>
                 AS
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 flex items-center justify-center text-white text-xs font-bold" style={{ borderColor: 'var(--bg-body)' }}>
                 RK
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 border-2 flex items-center justify-center text-white text-xs font-bold" style={{ borderColor: 'var(--bg-body)' }}>
                 PM
               </div>
             </div>
             <p className="text-sm font-medium text-muted">
-              Trusted by <span className="text-foreground font-semibold">1,200+</span> Indian freelancers
+              Trusted by <span className="text-foreground font-semibold">1,200+</span> freelancers worldwide
             </p>
           </div>
         </section>
@@ -151,17 +151,17 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-white">
+      <footer className="border-t border-border" style={{ backgroundColor: 'var(--bg-card)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted">
-            FreelanceOS © 2025 | Made for Indian freelancers
+            FreelanceOS © 2025 | Made for freelancers everywhere
           </p>
           <div className="flex items-center gap-1 text-sm text-muted">
             Built with
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#EF4444" stroke="none">
               <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
             </svg>
-            in India
+            worldwide
           </div>
         </div>
       </footer>

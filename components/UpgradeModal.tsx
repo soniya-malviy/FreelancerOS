@@ -41,7 +41,7 @@ export default function UpgradeModal({ isOpen, onClose, onUpgrade, isLoading }: 
             <div className="mb-6">
               <h3 className="text-xl font-bold text-foreground">Pro</h3>
               <div className="flex items-baseline gap-1 mt-2">
-                <span className="text-3xl font-extrabold text-foreground">₹799</span>
+                <span className="text-3xl font-extrabold text-foreground">$9</span>
                 <span className="text-muted text-sm font-medium">/month</span>
               </div>
             </div>
@@ -72,7 +72,7 @@ export default function UpgradeModal({ isOpen, onClose, onUpgrade, isLoading }: 
             <div className="mb-6">
               <h3 className="text-xl font-bold text-foreground">Agency</h3>
               <div className="flex items-baseline gap-1 mt-2">
-                <span className="text-3xl font-extrabold text-foreground">₹2,499</span>
+                <span className="text-3xl font-extrabold text-foreground">$29</span>
                 <span className="text-muted text-sm font-medium">/month</span>
               </div>
             </div>

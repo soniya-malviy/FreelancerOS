@@ -1,9 +1,10 @@
 import Link from "next/link";
 import UserNav from "./UserNav";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   return (
-    <nav className="w-full border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+    <nav className="w-full border-b border-border backdrop-blur-sm sticky top-0 z-50" style={{ backgroundColor: 'color-mix(in srgb, var(--bg-body) 85%, transparent)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -27,7 +28,10 @@ export default function Navbar() {
         </Link>
 
         {/* Right side */}
-        <UserNav />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <UserNav />
+        </div>
       </div>
     </nav>
   );

@@ -146,3 +146,20 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS skills TEXT[];
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS resume_url TEXT;
+
+-- =============================================
+-- PAGE VISITS TABLE (for admin analytics)
+-- Run this in Supabase SQL Editor
+-- =============================================
+CREATE TABLE IF NOT EXISTS public.page_visits (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  path TEXT NOT NULL,
+  visitor_id TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Allow inserts from anyone (anonymous tracking)
+ALTER TABLE public.page_visits ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert visits" ON public.page_visits FOR INSERT WITH CHECK (true);
+CREATE POLICY "Only service role can read visits" ON public.page_visits FOR SELECT USING (true);

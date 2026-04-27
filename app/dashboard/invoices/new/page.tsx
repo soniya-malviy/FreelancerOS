@@ -157,7 +157,7 @@ export default function NewInvoicePage() {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground">Amount *</label>
                 <input type="text" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} required
-                  className="w-full bg-gray-50 border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="₹25,000" />
+                  className="w-full bg-gray-50 border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="$500 or €450" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground">Due Date *</label>

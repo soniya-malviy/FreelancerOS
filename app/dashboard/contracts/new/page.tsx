@@ -174,7 +174,7 @@ export default function NewContractPage() {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground">Total Amount *</label>
                 <input type="text" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} required
-                  className="w-full bg-gray-50 border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="₹50,000 or $600" />
+                  className="w-full bg-gray-50 border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="$5,000 or €4,500" />
               </div>
             </div>
 

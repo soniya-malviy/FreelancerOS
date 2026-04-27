@@ -8,25 +8,46 @@ import {
   Receipt, 
   PlusCircle, 
   LogOut,
+  Sun,
+  Moon,
+  LayoutDashboard,
   User as UserIcon
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { useTheme } from "@/components/ThemeProvider";
+
+import { useEffect, useState } from "react";
 
 const navItems = [
   { name: "Proposals", href: "/dashboard", icon: FileText },
   { name: "Contracts", href: "/dashboard/contracts", icon: ScrollText },
   { name: "Invoices", href: "/dashboard/invoices", icon: Receipt },
+  { name: "Admin", href: "/admin", icon: LayoutDashboard, adminOnly: true },
   { name: "Profile", href: "/dashboard/settings", icon: UserIcon },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const supabase = createClient();
+  const { theme, toggleTheme } = useTheme();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email === "soniya.04malviya@gmail.com") {
+        setIsAdmin(true);
+      }
+    };
+    checkAdmin();
+  }, [supabase]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = "/";
   };
+
+  const visibleItems = navItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-white p-6 h-screen sticky top-0">
@@ -44,7 +65,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
           
@@ -76,6 +97,16 @@ export default function Sidebar() {
           <PlusCircle size={18} />
           New Proposal
         </Link>
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-medium text-muted">Theme</span>
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-muted hover:bg-gray-100 hover:text-foreground transition-all"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-muted hover:bg-red-50 hover:text-red-500 transition-all"

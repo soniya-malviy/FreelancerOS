@@ -308,7 +308,7 @@ export default function GeneratePage() {
       </main>
 
       <footer className="border-t border-border bg-white mt-auto py-6 text-center">
-        <p className="text-sm text-muted">FreelanceOS © 2025 | Made for Indian freelancers</p>
+        <p className="text-sm text-muted">FreelanceOS © 2025 | Made for freelancers everywhere</p>
       </footer>
     </div>
   );

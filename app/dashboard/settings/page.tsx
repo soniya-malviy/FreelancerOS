@@ -85,7 +85,8 @@ export default function SettingsPage() {
       .upload(filePath, file);
 
     if (uploadError) {
-      setMessage({ type: "error", text: "Error uploading image" });
+      console.error("Upload error:", uploadError);
+      setMessage({ type: "error", text: `Upload failed: ${uploadError.message}` });
     } else {
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
