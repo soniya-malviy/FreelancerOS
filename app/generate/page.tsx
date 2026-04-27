@@ -8,6 +8,7 @@ import ProposalOutput from "@/components/ProposalOutput";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Loader2, Sparkles, AlertCircle, FileText } from "lucide-react";
+import { getApiUrl, getAuthHeaders } from "@/utils/api";
 
 export default function GeneratePage() {
   const router = useRouter();
@@ -86,11 +87,12 @@ export default function GeneratePage() {
     setProposal("");
     setIsLoading(true);
     setIsSaved(false);
-
+    
     try {
-      const res = await fetch("/api/generate", {
+      const headers = await getAuthHeaders(supabase);
+      const res = await fetch(getApiUrl("/api/generate"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ jobDescription, rate, aboutYou, wordCount }),
       });
 

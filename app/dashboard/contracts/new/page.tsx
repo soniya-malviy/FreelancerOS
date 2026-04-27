@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2, ArrowLeft, Download, Copy, Check } from "lucide-react";
 import Link from "next/link";
+import { getApiUrl, getAuthHeaders } from "@/utils/api";
 
 interface Proposal {
   id: string;
@@ -85,9 +86,10 @@ export default function NewContractPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/generate-contract", {
+      const headers = await getAuthHeaders(supabase);
+      const res = await fetch(getApiUrl("/api/generate-contract"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(form),
       });
       const data = await res.json();

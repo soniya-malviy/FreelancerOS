@@ -15,6 +15,7 @@ import {
   Loader2,
   Image as ImageIcon
 } from "lucide-react";
+import { getApiUrl, getAuthHeaders } from "@/utils/api";
 
 export default function SettingsPage() {
   const supabase = createClient();
@@ -109,8 +110,12 @@ export default function SettingsPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/parse-resume", {
+      const headers = await getAuthHeaders(supabase);
+      delete headers["Content-Type"]; // Let browser set boundary for FormData
+      
+      const res = await fetch(getApiUrl("/api/parse-resume"), {
         method: "POST",
+        headers,
         body: formData,
       });
       const data = await res.json();
