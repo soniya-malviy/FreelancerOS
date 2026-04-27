@@ -40,6 +40,10 @@ const authenticate = async (req, res, next) => {
 };
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('FreelanceOS Backend is running! 🚀');
+});
+
 app.get('/api/keep-alive', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -147,7 +151,10 @@ app.post('/api/generate-contract', authenticate, async (req, res) => {
       messages: [{ role: "user", content: userPrompt }],
     });
 
-    res.json({ contract: chatCompletion.choices[0].message.content });
+    res.json({ 
+      contractText: chatCompletion.choices[0].message.content,
+      generationTime: 0 // Adding for compatibility
+    });
   } catch (error) {
     res.status(500).json({ error: "Contract generation failed" });
   }
@@ -172,7 +179,10 @@ app.post('/api/generate-invoice', authenticate, async (req, res) => {
       messages: [{ role: "user", content: userPrompt }],
     });
 
-    res.json({ invoice: chatCompletion.choices[0].message.content });
+    res.json({ 
+      invoiceText: chatCompletion.choices[0].message.content,
+      invoiceNumber: invoiceNumber 
+    });
   } catch (error) {
     res.status(500).json({ error: "Invoice generation failed" });
   }
