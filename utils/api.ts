@@ -5,10 +5,15 @@ export const getApiUrl = (path: string) => {
   return `${baseUrl}${cleanPath}`;
 };
 
-export const getAuthHeaders = async (supabase: any) => {
+export const getAuthHeaders = async (supabase: any): Promise<Record<string, string>> => {
   const { data: { session } } = await supabase.auth.getSession();
-  return {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
   };
+  
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
+  
+  return headers;
 };
