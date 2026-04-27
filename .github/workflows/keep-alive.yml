@@ -1,0 +1,15 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # Runs every 50 minutes to stay ahead of the spin-down timer
+    - cron: '*/50 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping FreelanceOS
+        run: |
+          curl -I https://YOUR_DEPLOYED_URL/api/keep-alive
