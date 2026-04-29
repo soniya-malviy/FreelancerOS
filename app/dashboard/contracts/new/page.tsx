@@ -227,7 +227,7 @@ export default function NewContractPage() {
               <div className="bg-white p-6 rounded-3xl border border-border shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-foreground">Generated Contract</h3>
-                  <span className="text-xs text-muted">{generationTime.toFixed(1)}s</span>
+                  <span className="text-xs text-muted">{(generationTime || 0).toFixed(1)}s</span>
                 </div>
                 <div className="max-h-[500px] overflow-y-auto custom-scrollbar bg-gray-50 p-6 rounded-2xl border border-gray-100">
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{contractText}</p>

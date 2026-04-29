@@ -151,9 +151,8 @@ export default function ProposalOutput({
         </button>
       </div>
 
-      {/* Generation time */}
       <p className="text-center text-sm text-muted mt-5">
-        Generated in {generationTime.toFixed(1)} seconds
+        Generated in {(generationTime || 0).toFixed(1)} seconds
       </p>
     </div>
   );
