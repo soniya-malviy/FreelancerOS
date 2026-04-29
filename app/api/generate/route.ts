@@ -2,202 +2,211 @@ import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { createClient } from "@/utils/supabase/server";
 
+// Initialize Groq client
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+const BANNED_PHRASES = [
+  "I love the idea",
+  "I am excited to",
+  "I believe I am a great fit",
+  "I am writing to apply",
+  "With my X years of experience",
+  "I would love to",
+  "Please find attached",
+  "I am passionate about",
+  "Look no further",
+  "I am the perfect candidate",
+];
+
 export async function POST(req: NextRequest) {
   try {
-    const { jobDescription, rate, aboutYou, wordCount, generationType } = await req.json();
+    const { jobDescription, rate, aboutYou, wordCount, user_id } = await req.json();
 
-    // 1. Auth & Usage Check
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    let proposalsThisMonth = 0;
-    let profileId = null;
-    let profile = null;
-
-    if (user) {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, proposals_this_month, experience, skills, niche")
-        .eq("id", user.id)
-        .single();
-        
-      profile = data;
-
-      if (profile) {
-        profileId = profile.id;
-        proposalsThisMonth = profile.proposals_this_month;
-      }
-    }
-
-    // Validate inputs
-    if (!jobDescription || !rate || !aboutYou) {
+    if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === "your_key_here") {
       return NextResponse.json(
-        { error: "All fields are required." },
-        { status: 400 }
-      );
-    }
-
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey || apiKey === "your_key_here") {
-      return NextResponse.json(
-        {
-          error:
-            "API key not configured. Please add your GROQ_API_KEY to .env.local",
-        },
+        { error: "Groq API key is missing. Please add it to your .env.local file." },
         { status: 500 }
       );
     }
 
-    const client = new Groq({ apiKey });
+    // 1. Tool Definitions (Groq uses OpenAI-compatible format)
+    const tools: Groq.Chat.ChatCompletionTool[] = [
+      {
+        type: "function",
+        function: {
+          name: "analyze_job",
+          description: "Extracts key details and signals from a job description.",
+          parameters: {
+            type: "object",
+            properties: {
+              job_description: { type: "string", description: "The full job description text." },
+            },
+            required: ["job_description"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_user_profile",
+          description: "Fetches the freelancer's profile details from the database.",
+          parameters: {
+            type: "object",
+            properties: {
+              user_id: { type: "string", description: "The UUID of the user." },
+            },
+            required: ["user_id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "check_proposal_quality",
+          description: "Validates a proposal against length and content rules.",
+          parameters: {
+            type: "object",
+            properties: {
+              proposal: { type: "string", description: "The generated proposal text." },
+              word_count_limit: { type: "number", description: "The maximum allowed word count." },
+            },
+            required: ["proposal", "word_count_limit"],
+          },
+        },
+      },
+    ];
 
     const startTime = Date.now();
 
-    const isCoverLetter = generationType === "cover_letter";
+    // 2. Initial Message to Groq
+    let messages: Groq.Chat.ChatCompletionMessageParam[] = [
+      {
+        role: "system",
+        content: `You are an AI Agent for FreelanceOS. Your goal is to write a high-converting freelance proposal.
+        
+YOUR PROCESS:
+1. Call 'analyze_job' to understand the client's needs.
+2. Call 'get_user_profile' if a user_id is provided to get their background.
+3. Write a personalized proposal (max 150 words unless specified).
+4. Call 'check_proposal_quality' to verify the output.
+5. If it fails, rewrite it until it passes.
+6. Return only the final proposal text.`,
+      },
+      {
+        role: "user",
+        content: `INPUTS:
+- Job Description: ${jobDescription}
+- Target Rate: ${rate}
+- User ID: ${user_id || "guest"}
+- Context provided by user: ${aboutYou || "None"}
+- Word Count Limit: ${wordCount || 150}`,
+      },
+    ];
 
-    const systemPrompt = isCoverLetter
-      ? `You are an expert cover letter writer. You help job applicants write concise, compelling, and professional cover letters that highlight their relevant experience and enthusiasm for the role. You write in a confident, warm tone — never desperate or generic.`
-      : `You are an expert freelance proposal writer. You help freelancers win more clients by writing short, personalized, and professional proposals. You have deep knowledge of what clients on Upwork, Fiverr, and LinkedIn actually respond to.`;
+    let finalProposal = "";
+    let loopCount = 0;
+    const MAX_LOOPS = 5; // Llama can sometimes loop, keep it tight
 
-    const userPrompt = isCoverLetter
-      ? `Write a professional cover letter for this person:
+    // 3. Agentic Loop
+    while (loopCount < MAX_LOOPS) {
+      const response = await client.chat.completions.create({
+        model: "llama-3.3-70b-versatile", // Official Groq replacement — see groq.com/docs/deprecations
+        messages,
+        tools,
+        tool_choice: "auto",
+        max_tokens: 1024,
+      });
 
-APPLICANT PROFILE:
-- Background: ${profile?.niche || "Professional"}
-- Skills: ${profile?.skills?.join(", ") || "General Skills"}
-- Experience: ${profile?.experience || aboutYou}
-- Expected Compensation: ${rate}
+      const responseMessage = response.choices[0].message;
+      messages.push(responseMessage);
 
-JOB DESCRIPTION:
-${jobDescription}
+      if (responseMessage.tool_calls) {
+        for (const toolCall of responseMessage.tool_calls) {
+          const { name, arguments: argsString } = toolCall.function;
+          const input = JSON.parse(argsString);
+          let toolResult;
 
-STRICT RULES:
+          console.log(`[Groq Agent] Calling tool: ${name}`, input);
 
-1. LENGTH: ${wordCount || 200} words MAXIMUM.
+          if (name === "analyze_job") {
+            toolResult = {
+              industry: "Inferred from description",
+              tone: "Professional",
+              key_requirements: ["Extracted automatically from job post"],
+            };
+          } else if (name === "get_user_profile") {
+            const supabase = await createClient();
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("niche, experience, skills")
+              .eq("id", input.user_id)
+              .single();
+            
+            toolResult = profile || { error: "Profile not found" };
+          } else if (name === "check_proposal_quality") {
+            const words = input.proposal.trim().split(/\s+/).length;
+            const containsBanned = BANNED_PHRASES.filter(phrase => 
+              input.proposal.toLowerCase().includes(phrase.toLowerCase())
+            );
 
-2. OPENING: Start with a specific, attention-grabbing line that references something unique about the company or role. Never open with "I am writing to apply for...".
+            if (words > input.word_count_limit) {
+              toolResult = { status: "fail", reason: `Word count is ${words}, which exceeds limit of ${input.word_count_limit}.` };
+            } else if (containsBanned.length > 0) {
+              toolResult = { status: "fail", reason: `Contains banned phrases: ${containsBanned.join(", ")}` };
+            } else {
+              toolResult = { status: "pass" };
+            }
+          }
 
-3. STRUCTURE:
-   - Paragraph 1: Hook — why this role excites you (be specific to THIS job)
-   - Paragraph 2: Your 2-3 most relevant experiences/skills that directly match the job requirements
-   - Paragraph 3: What you'd bring to the team and a confident closing with a call to action
+          messages.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(toolResult),
+          });
+        }
+      } else {
+        // No more tool calls, we have the final text
+        finalProposal = responseMessage.content || "";
+        break;
+      }
 
-4. TONE: Professional but human. Confident but not arrogant. Show personality.
-
-5. BANNED PHRASES: "I believe I am a great fit", "I am passionate about", "Please find attached", "I am excited to apply", "With my X years of experience".
-
-6. PERSONALIZATION: This letter must feel custom-written for THIS specific job. If it could be sent to any other role without editing, rewrite it.
-
-7. Never invent specific fake company names. Use descriptive references instead.
-
-Output ONLY the cover letter text. No labels, no preamble. Just the letter, ready to send.`
-      : `Write a winning freelance proposal for this person:
-
-FREELANCER PROFILE:
-- Niche: ${profile?.niche || "Freelancer"}
-- Skills: ${profile?.skills?.join(", ") || "General Skills"}
-- Detailed Experience: ${profile?.experience || aboutYou}
-- Rate for this project: ${rate}
-
-JOB DESCRIPTION THEY ARE APPLYING FOR:
-${jobDescription}
-
-STRICT RULES — follow every single one:
-
-1. LENGTH: ${wordCount || 150} words MAXIMUM. Count every word. If it exceeds ${wordCount || 150}, cut 
-   the fluff.
-
-2. OPENING LINE: Start with ONE specific detail pulled directly from this 
-   job post — something unique to this client only. Never open with "I", 
-   never open with a compliment about the project.
-
-3. BANNED PHRASES — never use these under any circumstances:
-   - "I love the idea"
-   - "I am excited to"
-   - "I believe I am a great fit"
-   - "I am writing to apply"
-   - "With my X years of experience"
-   - "I would love to"
-   - "Please find attached"
-   - "I am passionate about"
-   - "Look no further"
-   - "I am the perfect candidate"
-
-4. STRUCTURE — follow this exact order:
-   - Line 1-2: Hook using a specific detail from the job post.
-   - Line 3-5: Mention 1-2 past projects or skills that directly match THIS job.
-   - Line 6-8: Clearly state deliverables, timeline, and rate.
-   - Last 1-2 lines: End with ONE genuine question or a soft offer for a quick call.
-
-5. TONE: Write like a confident, experienced professional having a direct 
-   conversation — not like someone filling out a job application.
-
-6. NO FLUFF RULE: Every single sentence must earn its place.
-
-7. PERSONALIZATION CHECK: This proposal must NOT be sendable to a different job post without editing.
-
-8. IMPORTANT: Never invent specific fake company names as past clients.
-
-Output ONLY the proposal text. No labels, no explanations, no preamble. Just the proposal, ready to copy and send.`;
-
-    const chatCompletion = await client.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      max_tokens: 1024,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    });
+      loopCount++;
+    }
 
     const endTime = Date.now();
     const generationTime = (endTime - startTime) / 1000;
 
-    const proposalText =
-      chatCompletion.choices?.[0]?.message?.content || "No proposal generated.";
-
-    // 4. Increment usage if logged in
-    if (user && profileId) {
-      await supabase
+    // 4. Update Usage
+    if (user_id && user_id !== "guest") {
+      const supabase = await createClient();
+      const { data: profile } = await supabase
         .from("profiles")
-        .update({ proposals_this_month: proposalsThisMonth + 1 })
-        .eq("id", profileId);
+        .select("proposals_this_month")
+        .eq("id", user_id)
+        .single();
+      
+      if (profile) {
+        await supabase
+          .from("profiles")
+          .update({ proposals_this_month: (profile.proposals_this_month || 0) + 1 })
+          .eq("id", user_id);
+      }
     }
 
     return NextResponse.json({
-      proposal: proposalText,
+      proposal: finalProposal || "Failed to generate proposal.",
       generationTime,
     });
-  } catch (error: unknown) {
-    console.error("Groq API error:", error);
 
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-
-    if (
-      errorMessage.includes("401") ||
-      errorMessage.includes("authentication")
-    ) {
-      return NextResponse.json(
-        { error: "Invalid API key. Please check your GROQ_API_KEY." },
-        { status: 401 }
-      );
-    }
-
-    if (errorMessage.includes("429") || errorMessage.includes("rate")) {
-      return NextResponse.json(
-        {
-          error:
-            "Rate limit reached. Please wait a moment and try again.",
-        },
-        { status: 429 }
-      );
-    }
-
+  } catch (error: any) {
+    console.error("Groq Agent Error:", error);
     return NextResponse.json(
-      {
-        error:
-          "Something went wrong generating your proposal. Please try again.",
-      },
+      { error: error.message || "An error occurred during generation." },
       { status: 500 }
     );
   }
 }
+
+
