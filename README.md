@@ -1,15 +1,15 @@
-# 🚀 FreelanceOS — AI-Powered Agentic SaaS for Freelancers
+# FreelanceOS — AI-Powered Agentic SaaS for Freelancers
 
 Demo: https://www.loom.com/share/529c99fc56df456da8517d8dd9836b10
 
-## ✨ Overview
+## Overview
 **FreelanceOS** is an autonomous, AI-driven SaaS platform designed specifically for the modern freelancer. It solves the most time-consuming part of freelancing: **proposal writing and administrative overhead.** 
 
 Instead of spending 45 minutes crafting a single pitch, FreelanceOS allows users to paste a job description and generate a highly personalized, professional proposal, cover letter, contract, and invoice in **under 30 seconds**.
 
 ---
 
-## 🧠 The Agentic Core: How it Works
+## The Agentic Core: How it Works
 Unlike standard chatbots, FreelanceOS operates using a **Multi-Agent Orchestration Pipeline**. When you provide a job description, 5 specialized AI agents work in sequence:
 
 1.  **Context Gathering Agent**: Scans the job description to extract client industry, project type, tone expectations, and hidden signals.
@@ -20,7 +20,7 @@ Unlike standard chatbots, FreelanceOS operates using a **Multi-Agent Orchestrati
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Frontend**: [Next.js 15+](https://nextjs.org/) (App Router, Tailwind CSS, Lucide Icons)
 - **Backend**: [Supabase](https://supabase.com/) (Auth, PostgreSQL, Row-Level Security)
 - **AI Intelligence**: [Groq](https://groq.com/) with **Llama 3.3 70B** (Ultra-fast inference)
@@ -30,7 +30,7 @@ Unlike standard chatbots, FreelanceOS operates using a **Multi-Agent Orchestrati
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -69,7 +69,7 @@ Unlike standard chatbots, FreelanceOS operates using a **Multi-Agent Orchestrati
 
 ---
 
-## 📈 Current Status & Roadmap
+##  Current Status & Roadmap
 - [x] **MVP Phase**: Multi-agent proposal pipeline core logic.
 - [x] **Database integration**: Storing proposals, profiles, and history.
 - [ ] **Phase 2**: Authentication, payments (Razorpay), and analytics dashboard.
@@ -77,7 +77,7 @@ Unlike standard chatbots, FreelanceOS operates using a **Multi-Agent Orchestrati
 
 ---
 
-## 💡 Why FreelanceOS?
+## Why FreelanceOS?
 Indian freelancers often waste hours on unpaid administrative tasks. FreelanceOS turns a **45-minute task into a 30-second workflow**, increasing win rates through hyper-personalization and allowing freelancers to focus on what they do best: **building.**
 
 ---
