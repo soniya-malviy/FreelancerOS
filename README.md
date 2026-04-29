@@ -1,6 +1,6 @@
 # 🚀 FreelanceOS — AI-Powered Agentic SaaS for Freelancers
 
-![FreelanceOS Banner](./public/banner.png)
+![FreelanceOS Banner](./public/Image 29-04-26 at 18.14.jpeg)
 
 ## ✨ Overview
 **FreelanceOS** is an autonomous, AI-driven SaaS platform designed specifically for the modern freelancer. It solves the most time-consuming part of freelancing: **proposal writing and administrative overhead.** 
