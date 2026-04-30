@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Ping FreelanceOS
         run: |
-          curl -I https://YOUR_DEPLOYED_URL/api/keep-alive
+          curl -I https://freelanceros-1.onrender.com/api/keep-alive
